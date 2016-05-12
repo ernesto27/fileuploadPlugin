@@ -9,8 +9,8 @@
 
 		var indexFile = 0;
 		var indexAjax = 0;
-		var response = [];
-
+		var deletedIndex = []
+        var response = [];
 
 		window.fileUpload = {
 			files: [],
@@ -24,6 +24,7 @@
 			events: function(){
 				$('.fileupload-input').on('change', this.showPrevew);
 				$('.btn-response').on('click', this.viewResponse);
+                $('body').on('click', '.fileupload-removeitem', this.removeItem);
 			},
 
 			// Methods
@@ -68,7 +69,13 @@
                 reader.readAsDataURL(file);
 			},
 
-			
+			removeItem: function(e){
+                e.preventDefault();
+                var that = $(this);
+                that.parent().parent().remove();
+                var index = that.data("id");
+                deletedIndex.push(index);
+            },
 
 			// Helpers
 			isValidImage: function(type){
@@ -107,6 +114,7 @@
                                 .addClass("progress-bar-success");
 
                         // Add server response to array
+                        data.id = indexAjax;
                         response.push(data);    	
 
                         // Go to next item
@@ -147,7 +155,14 @@
             },
 
             viewResponse: function(){
-            	console.log(response);
+                var items = [];
+            	response.forEach(function(item){                           
+                    if(deletedIndex.indexOf(item.id) == -1 ){
+                        items.push(item);
+                    }
+                });
+                console.log(items);
+                return items;
             }
 		};
 
