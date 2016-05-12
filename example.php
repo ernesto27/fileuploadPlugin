@@ -29,14 +29,16 @@
 	<br><br>
 	<div class="container">
 		
+
+		<form>
+			<input type="file" class="fileupload-input" multiple>
+			<br>
+		</form>
+		
+		<button class="btn btn-primary btn-response">Log server response</button>
+
 		<div id="example">
 			
-			<form>
-				<input type="file" class="fileupload-input" multiple>
-				<br>
-			</form>
-			
-			<button class="btn btn-primary btn-response">Log server response</button>
 			<br>
 			<div class="filesupload-wrapper" style="width: 150px;height: 200px;">
 			</div>
@@ -70,7 +72,8 @@
 	<script>	
 	$(function(){
 		$('#example').fileUpload({
-			url: "upload.php",
+			url: 'upload.php',
+			maxSize: 200 // For now on kb
 		});
 	});
 

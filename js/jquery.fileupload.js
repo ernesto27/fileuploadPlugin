@@ -1,11 +1,12 @@
 ;(function($){
 	var customsUploadOptions = {
-		url: ''
+		url: '',
+        maxSize: 3000
 	};
 
 	$.fn.fileUpload = function(options){
 	
-		options = $.extend(true, {}, $.customsUploadOptions, options || {});
+		options = $.extend(true, {}, customsUploadOptions, options || {});
 
 		var indexFile = 0;
 		var indexAjax = 0;
@@ -39,21 +40,29 @@
                         // Check valid image
                         if(fileUpload.isValidImage(type)){
                         	file.id = indexFile;
-                        	fileUpload.files.push(file);
-                        	indexFile += 1;
+                            // Check maxfilesize upload
+                            if(fileUpload.isValidSize(file.size)){
+                               fileUpload.files.push(file);
+                        	   indexFile += 1;
+                            }
                         }
                     }
                 }
-                // Render preview - for now use handlebars template
-                // later you have to consider other option
-                fileUpload.renderPreview(fileUpload.files[fileUpload.indexPreview]);
 
-                // Do ajax upload files
-                fileUpload.ajaxUpload();
+                if(fileUpload.files.length){
+                    // Render preview - for now use handlebars template
+                    // later you have to consider other option
+                    fileUpload.renderPreview(fileUpload.files[fileUpload.indexPreview]);
+
+                    // Do ajax upload files
+                    fileUpload.ajaxUpload();
+                }
+
 
 			},
 		
 			renderPreview: function(file){
+                if(!file) return;
 				var reader = new FileReader();
                 reader.onload = function (e) {
                     $('.filesupload-wrapper').append(fileUpload.previewTpl({
@@ -86,9 +95,16 @@
                 }
 			},
 
+            isValidSize: function(size){
+                if(size <= options.maxSize * 1024){
+                    return true;
+                }
+            },
+
 
 			// Ajax request
 			ajaxUpload: function(){
+                if(!fileUpload.files[indexAjax]) return;
                 var formData = new FormData();
                 formData.append("file", fileUpload.files[indexAjax]);
 
@@ -132,12 +148,9 @@
 
                 function progress(e){
 	                if(e.lengthComputable){
-	                	console.log("Index ajax " + indexAjax)
 	                    var max = e.total;
 	                    var current = e.loaded;
 	                    var percentage = (current * 100)/max;
-	                    console.log(percentage);
-	                    console.log(fileUpload.files[indexAjax].id);
 	                    $(".preview-" + fileUpload.files[indexAjax].id).css("width", percentage + "%");
 	                }
             	}
